@@ -1,0 +1,26 @@
+services:
+  web:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./apps/web:/app
+      - ./packages/calculator-core:/calculator-core
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8080
+
+  api:
+    image: eclipse-temurin:21-jdk
+    working_dir: /app
+    volumes:
+      - ./services/api:/app
+      - maven-cache:/root/.m2
+    command: sh -c "./mvnw spring-boot:run || mvn spring-boot:run"
+    ports:
+      - "8080:8080"
+    profiles: [api]
+
+volumes:
+  maven-cache:
